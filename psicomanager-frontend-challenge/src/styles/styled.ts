@@ -1,4 +1,13 @@
-const Container = styled.div`
-  padding: 20px;
-  background-color: #f5f5f5;
-`;
+// src/styles/styled.d.ts
+import 'styled-components';
+
+declare module 'styled-components' {
+  export interface DefaultTheme {
+    colors: {
+      background: string;
+      text: string;
+      primary: string;
+      secondary: string;
+    };
+  }
+}
