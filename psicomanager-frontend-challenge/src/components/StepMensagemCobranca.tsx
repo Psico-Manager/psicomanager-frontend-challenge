@@ -1,88 +1,171 @@
-import { useFormContext } from 'react-hook-form';
-import { useState } from 'react';
-import dynamicTags from '../utils/dynamicTags'; // Supondo que você tenha uma lista de marcações
+import { Controller, useFormContext } from 'react-hook-form';
+import { useState, useRef } from 'react';
+import dynamicTags from '../utils/dynamicTags';
+import Quill from 'quill';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
-const StepMensagemCobranca = ({ onNext, onCancel }: { onNext: () => void; onCancel: () => void }) => {
-  const { register, setValue, getValues, formState: { errors } } = useFormContext();
+
+// ✅ Registre os formatos de lista manualmente
+const List = Quill.import('formats/list');
+Quill.register(List, true);
+
+const StepMensagemCobranca = ({
+  onNext,
+  onCancel,
+}: {
+  onNext: () => void;
+  onCancel: () => void;
+}) => {
+const {
+  control,
+  trigger,
+  setValue,
+  getValues,
+  formState: { errors },
+} = useFormContext(); useFormContext();
+
   const [selectedTag, setSelectedTag] = useState('');
+  const quillRef = useRef<ReactQuill | null>(null);
 
-  const insertTag = () => {
-    const currentContent = getValues('mensagem') || '';
-    const newContent = `${currentContent} {{${selectedTag}}}`;
-    setValue('mensagem', newContent);
+  const modules = {
+  toolbar: [
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    ['bold', 'italic'],
+    [{ align: [] }],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['link'],
+    ['clean'],
+  ],
+  history: {
+    delay: 1000,
+    maxStack: 100,
+    userOnly: true,
+  },
+};
+
+const formats = ['header', 'bold', 'italic', 'align', 'list', 'link'];
+
+const insertTag = (tag: string) => {
+  const mensagemAtual = getValues("mensagem");
+  setValue("mensagem", `${mensagemAtual} ${tag}`);
+};
+
+const handleNext = async () => {
+  const isValid = await trigger("mensagem");
+  if (!isValid) return;
+  onNext();
+};
+  
+  const handleUndo = () => {
+    const editor = quillRef.current?.getEditor();
+    const history = editor?.getModule('history') as { undo: () => void } | undefined;
+    history?.undo();
   };
 
+  const handleRedo = () => {
+    const editor = quillRef.current?.getEditor();
+    const history = editor?.getModule('history') as { redo: () => void } | undefined;
+    history?.redo();
+  };
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-md w-full max-w-xl mx-auto mt-10">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Canais de Envio e Mensagens de Cobrança</h2>
+    <div className="p-8 bg-white shadow-lg rounded-xl w-full max-w-2xl mx-auto mt-12 border border-gray-200">
+      <h2 className="text-2xl font-bold mb-6 text-gray-900 tracking-tight">
+        Canais de Envio e Mensagens de Cobrança
+      </h2>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Profissional */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Profissional</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Profissional</label>
           <input
-            {...register('profissional')}
+            value=" Dr. Danilo" required
+            readOnly
             disabled
-            className="w-full border p-2 rounded bg-gray-100 text-gray-600"
+            className="w-full border border-gray-300 p-3 rounded-md bg-gray-100 text-gray-800 font-medium shadow-sm"
           />
         </div>
 
         {/* Marcação Dinâmica */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Marcação Dinâmica</label>
-          <div className="flex gap-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Marcação Dinâmica</label>
+          <div className="flex gap-3">
             <select
               value={selectedTag}
               onChange={(e) => setSelectedTag(e.target.value)}
-              className="border p-2 rounded w-full"
+              className="border border-gray-300 p-3 rounded-md w-full text-gray-700 shadow-sm"
             >
               <option value="">Selecione</option>
               {dynamicTags.map((tag) => (
-                <option key={tag} value={tag}>{tag}</option>
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
               ))}
             </select>
             <button
-              type="button"
-              onClick={insertTag}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+               type="button"
+               onClick={() => insertTag(selectedTag)}
+               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md"
             >
-              Inserir
+             Inserir
             </button>
           </div>
         </div>
+        <div className="relative">
+  {/* Botões flutuantes no canto superior direito */}
+  <div className="absolute top-2 right-2 flex gap-2 z-10">
+    <button
+      type="button"
+      onClick={handleUndo}
+      className="px-2 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+    >
+      ⟲
+    </button>
+    <button
+      type="button"
+      onClick={handleRedo}
+      className="px-2 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+    >
+      ⟳
+    </button>
+  </div>
 
         {/* Editor de Texto */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Conteúdo da Mensagem</label>
-          <textarea
-            {...register('mensagem', { required: 'Conteúdo da mensagem é obrigatório' })}
-            rows={8}
-            className="w-full border p-2 rounded"
-          />
-         {typeof errors.mensagem?.message === 'string' && (
-         <p className="text-red-500 text-sm mt-1">{errors.mensagem.message}</p>
-         )}
+<Controller
+  name="mensagem"
+  control={control}
+  rules={{ required: "A mensagem é obrigatória." }}
+  render={({ field }) => (
+    <ReactQuill
+      ref={quillRef}
+      value={field.value}
+      onChange={field.onChange}
+      modules={modules}
+      formats={formats}
+      className="bg-white border border-gray-300 rounded-md shadow-sm"
+    />
+  )}
+/>
+          {errors.mensagem?.message && typeof errors.mensagem.message === 'string' && (
+            <p className="text-red-500 text-sm mt-2">{errors.mensagem.message}</p>
+          )}
         </div>
       </div>
 
       {/* Botões de Navegação */}
-      <div className="flex justify-between mt-6">
+      <div className="flex justify-between mt-8">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          className="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors shadow-sm"
         >
           Cancelar
         </button>
         <button
           type="button"
-          onClick={() => {
-            const mensagem = getValues('mensagem');
-            if (!mensagem) return setValue('mensagem', '', { shouldValidate: true });
-            onNext();
-          }}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          onClick={handleNext}
+          className="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-md"
         >
           Próximo
         </button>
@@ -92,3 +175,4 @@ const StepMensagemCobranca = ({ onNext, onCancel }: { onNext: () => void; onCanc
 };
 
 export default StepMensagemCobranca;
+

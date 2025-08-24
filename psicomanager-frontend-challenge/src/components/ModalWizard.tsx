@@ -5,6 +5,7 @@ import { bankFormSchema } from "../schemas/bankFormSchema";
 //import FinanceiroWizard from "./FinanceiroWizard";
 import './FormStyle.css';
 import StepMensagemCobranca from "./StepMensagemCobranca";
+import Step3Form from "./Step3Form";
 
 type BankFormData = {
   profissional: string;
@@ -26,6 +27,7 @@ type BankFormData = {
   cnpj?: string;
   nomeResponsavel?: string;
   cpfResponsavel?: string;
+  mensagem: string;
 };
 
 const onSubmit = (data: BankFormData) => {
@@ -44,15 +46,16 @@ const ModalWizard = ({ onClose }: { onClose: () => void }) => {
   const personTypes = ["Pessoa Física", "Pessoa Jurídica"];
   const states = ["MG", "SP", "RJ", "RS", "BA", "PR", "SC", "PE", "DF"];
 
+  function onNext() {
+  // por exemplo, avançar para o próximo passo do wizard
+  setStep((prev) => prev + 1);
+}
 const {
   register,
   trigger,
   watch,
   formState: { errors },
-} = useForm({
-  resolver: zodResolver(bankFormSchema),
-  shouldUnregister: true,
-});
+} = methods
 
   const selectedPersonType = watch("tipoPessoa");
 
@@ -188,10 +191,26 @@ const {
   <button type="button" onClick={onClose}>Cancelar</button>
 <button
   type="button"
-onClick={ async () => {
-  const isValid = await trigger(); // valida todos os campos visíveis
+onClick={async () => {
+  const tipoPessoa = methods.getValues("tipoPessoa");
+
+  let isValid = false;
+
+  if (tipoPessoa === "Pessoa Física") {
+    isValid = await trigger([
+      "profissional", "banco", "tipoConta", "agencia", "contaComDigito",
+      "tipoPessoa", "cpf", "telefone", "cep", "estado", "cidade", "endereco", "numero"
+    ]);
+  } else {
+    isValid = await trigger([
+      "profissional", "banco", "tipoConta", "agencia", "contaComDigito",
+      "tipoPessoa", "razaoSocial", "cnpj", "nomeResponsavel", "cpfResponsavel",
+      "telefone", "cep", "estado", "cidade", "endereco", "numero"
+    ]);
+  }
+
   if (isValid) {
-    onNext(); // avança para o passo 2
+    onNext();
   }
 }}
   className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
@@ -200,26 +219,31 @@ onClick={ async () => {
 </button>
 </div>
 </>
-
 )}
 {step === 1 && (
-  <StepMensagemCobranca
-    onNext={() => {
-      methods.handleSubmit(onSubmit)(); // chama validação + console.log
+<StepMensagemCobranca
+  onNext={() => {
+    methods.handleSubmit((data) => {
+      console.log("Dados válidos:", data);
+      setStep((prev) => prev + 1); // aqui avança para o Step 2
+    })();
+  }}
+  onCancel={onClose}
+/>
+)}
+{step === 2 && (
+  <Step3Form
+    onClose={onClose}
+    onSuccess={() => {
+      console.log("Finalizado com sucesso");
+      onClose(); // ou redirecionamento
     }}
-    onCancel={onClose}
   />
 )}
       </div>
     </form>
     </FormProvider>
   );
-
-function onNext() {
-  // por exemplo, avançar para o próximo passo do wizard
-  setStep((prev) => prev + 1);
-}
-
 };
 
 

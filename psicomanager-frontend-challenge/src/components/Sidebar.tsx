@@ -4,17 +4,19 @@ interface SidebarProps {
   onFinanceiroClick: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onFinanceiroClick }) => {
+// eslint-disable-next-line no-empty-pattern
+const Sidebar: React.FC<SidebarProps> = ({ }) => {
   return (
     <div style={styles.sidebar}>
-      <h2 style={styles.title}>Painel</h2>
+      <button disabled style={styles.disabled}>Painel</button>
 
       <button disabled style={styles.disabled}>Clientes</button>
       <button disabled style={styles.disabled}>Agenda</button>
 
-      <button onClick={onFinanceiroClick} style={styles.active}>
-        Financeiro
-      </button>
+       <button style={styles.active}>
+       Financeiro
+       </button>
+
 
       <button disabled style={styles.disabled}>Relatórios</button>
       <button disabled style={styles.disabled}>Marketing</button>

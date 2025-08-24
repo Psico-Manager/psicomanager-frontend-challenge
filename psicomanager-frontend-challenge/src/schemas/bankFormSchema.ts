@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 
 export const bankFormSchema = z
   .object({
@@ -9,7 +9,7 @@ export const bankFormSchema = z
     contaComDigito: z.string().min(1, "Conta com dígito é obrigatória"),
     conta: z.string().optional(),
     tipoPessoa: z.string().min(1, "Tipo de pessoa é obrigatório"),
-    cpf: z.string().min(1, "CPF é obrigatório"),
+    cpf: z.string().min(1, "CPF é obrigatório"), // ✅ obrigatório sempre
     telefone: z.string().min(1, "Telefone é obrigatório"),
     nomeCompleto: z.string().optional(),
     cep: z.string().min(1, "CEP é obrigatório"),
@@ -17,24 +17,41 @@ export const bankFormSchema = z
     cidade: z.string().min(1, "Cidade é obrigatória"),
     endereco: z.string().min(1, "Endereço é obrigatório"),
     numero: z.string().min(1, "Número é obrigatório"),
-
+    mensagem: z.string().min(1, "A mensagem é obrigatória"),
     razaoSocial: z.string().optional(),
     cnpj: z.string().optional(),
     nomeResponsavel: z.string().optional(),
     cpfResponsavel: z.string().optional(),
   })
-  
-  .refine((data) => {
+  .superRefine((data, ctx) => {
     if (data.tipoPessoa === "Pessoa Jurídica") {
-      return (
-        !!data.razaoSocial &&
-        !!data.cnpj &&
-        !!data.nomeResponsavel &&
-        !!data.cpfResponsavel
-      );
+      if (!data.razaoSocial || data.razaoSocial.trim() === "") {
+        ctx.addIssue({
+          path: ["razaoSocial"],
+          code: z.ZodIssueCode.custom,
+          message: "Razão Social é obrigatória",
+        });
+      }
+      if (!data.cnpj || data.cnpj.trim() === "") {
+        ctx.addIssue({
+          path: ["cnpj"],
+          code: z.ZodIssueCode.custom,
+          message: "CNPJ é obrigatório",
+        });
+      }
+      if (!data.nomeResponsavel || data.nomeResponsavel.trim() === "") {
+        ctx.addIssue({
+          path: ["nomeResponsavel"],
+          code: z.ZodIssueCode.custom,
+          message: "Nome do responsável é obrigatório",
+        });
+      }
+      if (!data.cpfResponsavel || data.cpfResponsavel.trim() === "") {
+        ctx.addIssue({
+          path: ["cpfResponsavel"],
+          code: z.ZodIssueCode.custom,
+          message: "CPF do responsável é obrigatório",
+        });
+      }
     }
-    return true;
-  }, {
-    message: "Campos obrigatórios para Pessoa Jurídica estão faltando",
-    path: ["tipoPessoa"], // você pode apontar para um campo específico
   });
