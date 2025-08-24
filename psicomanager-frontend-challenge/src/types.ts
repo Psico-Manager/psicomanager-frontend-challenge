@@ -1,0 +1,21 @@
+export type BankFormData = {
+  profissional: string;
+  banco: string;
+  tipoConta: string;
+  agencia: string;
+  contaComDigito: string;
+  tipoPessoa: string;
+  cpf: string;
+  telefone: string;
+  cep: string;
+  estado: string;
+  cidade: string;
+  endereco: string;
+  numero: string;
+  conta?: string;
+  nomeCompleto?: string;
+  razaoSocial?: string;
+  cnpj?: string;
+  nomeResponsavel?: string;
+  cpfResponsavel?: string;
+};

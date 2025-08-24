@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginData } from '../schemas/loginSchema'
+import { loginSchema } from '../schemas/loginSchema'
+import type { LoginData } from '../schemas/loginSchema';
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginData>({

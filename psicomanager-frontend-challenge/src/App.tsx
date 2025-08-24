@@ -1,22 +1,23 @@
-// src/App.tsx
-import { ThemeProvider } from 'styled-components';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { theme } from './styles/theme';
-import GlobalStyle from './styles/global.ts';
-import Home from './pages/Home.tsx';
-import Editor from './components/Editor';
+import { useState } from "react";
+import Sidebar from "./components/Sidebar";
+import ModalWizard from "./components/ModalWizard";
 
 function App() {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleFinanceiroClick = () => {
+    setShowModal(true);
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/editor" element={<Editor />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <div style={{ display: "flex" }}>
+      <Sidebar onFinanceiroClick={handleFinanceiroClick} />
+
+      <main style={{ flex: 1, padding: "2rem" }}>
+        <h1>Bem-vindo ao sistema</h1>
+        {showModal && <ModalWizard onClose={() => setShowModal(false)} />}
+      </main>
+    </div>
   );
 }
 
