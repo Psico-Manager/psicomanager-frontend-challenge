@@ -10,20 +10,22 @@ import 'react-quill-new/dist/quill.snow.css';
 const List = Quill.import('formats/list');
 Quill.register(List, true);
 
-const StepMensagemCobranca = ({
+export const StepMensagemCobranca = ({
   onNext,
   onCancel,
 }: {
   onNext: () => void;
   onCancel: () => void;
 }) => {
+const methods = useFormContext();
+
 const {
   control,
   trigger,
   setValue,
   getValues,
   formState: { errors },
-} = useFormContext(); useFormContext();
+} = methods;
 
   const [selectedTag, setSelectedTag] = useState('');
   const quillRef = useRef<ReactQuill | null>(null);
@@ -52,11 +54,37 @@ const insertTag = (tag: string) => {
 };
 
 const handleNext = async () => {
-  const isValid = await trigger("mensagem");
-  if (!isValid) return;
+  const tipoPessoa = getValues("tipoPessoa");
+  const mensagem = getValues("mensagem");
+
+  const isMensagemValida = mensagem && mensagem.replace(/<(.|\n)*?>/g, '').trim().length > 0;
+
+  const camposBase = [
+    "mensagem", "profissional", "banco", "tipoConta", "agencia", "contaComDigito",
+    "tipoPessoa", "telefone", "cep", "estado", "cidade", "endereco", "numero"
+  ];
+
+  const camposPessoaFisica = ["cpf"];
+  const camposPessoaJuridica = ["razaoSocial", "cnpj", "nomeResponsavel", "cpfResponsavel"];
+
+  const campos = tipoPessoa === "Pessoa Física"
+    ? [...camposBase, ...camposPessoaFisica]
+    : [...camposBase, ...camposPessoaJuridica];
+
+  const isValid = await trigger(campos);
+
+  console.log("Campos validados:", campos);
+  console.log("Trigger retornou:", isValid);
+  console.log("Mensagem válida:", isMensagemValida);
+  console.log("Erros:", errors);
+
+  if (isValid && isMensagemValida) {
+  const data = getValues();
+  console.log("Dados válidos:", data);
   onNext();
-};
-  
+}
+
+}
   const handleUndo = () => {
     const editor = quillRef.current?.getEditor();
     const history = editor?.getModule('history') as { undo: () => void } | undefined;
@@ -135,7 +163,12 @@ const handleNext = async () => {
 <Controller
   name="mensagem"
   control={control}
-  rules={{ required: "A mensagem é obrigatória." }}
+  rules={{
+  validate: (value) => {
+    const plainText = value.replace(/<(.|\n)*?>/g, '').trim();
+    return plainText.length > 0 || "A mensagem é obrigatória.";
+  }
+}}
   render={({ field }) => (
     <ReactQuill
       ref={quillRef}
@@ -175,4 +208,3 @@ const handleNext = async () => {
 };
 
 export default StepMensagemCobranca;
-

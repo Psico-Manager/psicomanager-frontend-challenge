@@ -221,16 +221,12 @@ onClick={async () => {
 </>
 )}
 {step === 1 && (
-<StepMensagemCobranca
-  onNext={() => {
-    methods.handleSubmit((data) => {
-      console.log("Dados válidos:", data);
-      setStep((prev) => prev + 1); // aqui avança para o Step 2
-    })();
-  }}
-  onCancel={onClose}
-/>
+  <StepMensagemCobranca
+    onNext={() => setStep((prev) => prev + 1)} // ✅ só avança se o componente permitir
+    onCancel={onClose}
+  />
 )}
+
 {step === 2 && (
   <Step3Form
     onClose={onClose}
