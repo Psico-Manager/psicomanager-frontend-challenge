@@ -1,0 +1,29 @@
+# Dependências
+/node_modules
+
+# Arquivos de build
+/dist
+/dist-ssr
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Arquivos de cache
+.vite
+*.cache
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
