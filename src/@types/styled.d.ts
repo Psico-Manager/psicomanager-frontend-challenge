@@ -1,4 +1,3 @@
-// styled.d.ts
 import "styled-components";
 
 declare module "styled-components" {
@@ -19,6 +18,12 @@ declare module "styled-components" {
       sidebarText: string;
       sidebarMuted: string;
       stepBg: string;
+
+      // Adicione estas cores do AlertBox
+      alertYellowBg: string;
+      alertYellowText: string;
+      alertBlueBg: string;
+      alertBlueText: string;
     };
     radii: {
       sm: string;

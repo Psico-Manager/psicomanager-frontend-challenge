@@ -1,13 +1,37 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
-export const Button = styled.button<{variant?:'primary'|'secondary'}>`
-  padding: ${({theme})=> theme.space(3)} ${({theme})=> theme.space(5)};
-  border-radius: ${({theme})=> theme.radii.md};
-  border: none;
-  background: ${({variant='primary', theme})=> variant==='primary' ? theme.colors.primary : '#F3F4F6'};
-  color: ${({variant='primary'})=> variant==='primary' ? '#fff' : '#111827'};
+export const Button = styled.button<{
+  variant?: "primary" | "secondary" | "tertiary";
+}>`
+  padding: ${({ theme }) => theme.space(2)} ${({ theme }) => theme.space(8)};
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: ${({ variant = "primary", theme }) =>
+    variant === "primary"
+      ? "none"
+      : variant === "secondary"
+      ? `1px solid ${theme.colors.primary}`
+      : "none"};
+  background: ${({ variant = "primary", theme }) =>
+    variant === "primary"
+      ? theme.colors.primary
+      : variant === "secondary"
+      ? "#F3F4F6"
+      : "transparent"};
+  color: ${({ variant = "primary", theme }) =>
+    variant === "primary"
+      ? "#fff"
+      : variant === "secondary"
+      ? theme.colors.primary
+      : theme.colors.primary};
   cursor: pointer;
-  transition: .12s;
-  &:hover{ filter: brightness(.95); }
-  &:disabled{ opacity:.6; cursor:not-allowed; }
-`
+  transition: 0.12s;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
