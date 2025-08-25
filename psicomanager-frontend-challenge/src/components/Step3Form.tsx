@@ -1,11 +1,12 @@
-import {  useFormContext, type SubmitHandler } from "react-hook-form";
+import { useFormContext, type SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 
-type FormValues = {
-  metodoPagamento: string; 
+type Step3FormValues = {
+  metodoPagamento: string[];
   cobrarMulta: boolean;
   valorMulta?: number;
   cobrarJuros: boolean;
+  valorJuros?: number;
 };
 
 interface Step3FormProps {
@@ -14,20 +15,23 @@ interface Step3FormProps {
 }
 
 export default function Step3Form({ onClose, onSuccess }: Step3FormProps) {
-  const methods = useFormContext<FormValues>(); // usando o contexto do FormProvider
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = methods;
+const {
+  watch,
+  getValues,
+  setValue,
+  trigger,
+  formState: { errors },
+} = useFormContext<Step3FormValues>();
+
+const cobrarMulta = watch("cobrarMulta");
+const cobrarJuros = watch("cobrarJuros");
+const valorMulta = watch("valorMulta") ?? "";
+const valorJuros = watch("valorJuros") ?? "";
 
   const [showSuccess, setShowSuccess] = useState(false);
-  const cobrarMulta = watch("cobrarMulta");
 
-  
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onSubmit: SubmitHandler<FormValues> = (_data) => {
+  const onSubmit: SubmitHandler<Step3FormValues> = (_data) => {
     setShowSuccess(true);
     setTimeout(() => {
       setShowSuccess(false);
@@ -35,73 +39,119 @@ export default function Step3Form({ onClose, onSuccess }: Step3FormProps) {
     }, 3000);
   };
 
+  const handleConcluir = async () => {
+    const campos: (keyof Step3FormValues)[] = [
+      "metodoPagamento",
+      "cobrarMulta",
+      "valorMulta",
+      "cobrarJuros",
+      "valorJuros",
+    ];
+
+    const isValid = await trigger(campos);
+
+    if (isValid) {
+      onSubmit(getValues());
+    }
+  };
+
+  const metodoAtual = watch("metodoPagamento") ?? [];
+  const opcoes = ["boleto", "pix", "cartao"];
+
   return (
     <div className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Profissional</label>
+      {/* ... Profissional ... */}
+<div>
+  <label className="block text-sm font-medium text-gray-700">Método de Pagamento</label>
+  <div className="flex gap-4 mt-2">
+    {opcoes.map((opcao) => (
+      <label key={opcao} className="flex items-center gap-2 cursor-pointer">
         <input
-          type="text"
-          disabled
-          defaultValue="Dr. Danilo" required
-          className="mt-1 block w-full bg-gray-100 border border-gray-300 rounded px-3 py-2"
+          type="checkbox"
+          value={opcao}
+          checked={metodoAtual.includes(opcao)}
+          onChange={() => {
+            const novo = metodoAtual.includes(opcao)
+              ? metodoAtual.filter((v) => v !== opcao)
+              : [...metodoAtual, opcao];
+            setValue("metodoPagamento", novo);
+          }}
         />
-      </div>
+        {opcao.charAt(0).toUpperCase() + opcao.slice(1)}
+      </label>
+    ))}
+  </div>
+  {errors.metodoPagamento && (
+    <p className="text-red-500 text-sm mt-1">{errors.metodoPagamento.message}</p>
+  )}
+</div>
+<div>
+  <label className="flex items-center gap-2">
+    <input
+      type="checkbox"
+      checked={cobrarMulta ?? false}
+      onChange={() => setValue("cobrarMulta", !cobrarMulta)}
+    />
+    Cobrar Multa
+  </label>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Método de Pagamento</label>
-        <div className="flex gap-4 mt-2">
-          {["boleto", "pix", "cartao"].map((method) => (
-            <label key={method} className="flex items-center gap-2">
-              <input
-                type="radio"
-                value={method}
-                {...register("metodoPagamento", { required: true })}
-              />
-              {method.charAt(0).toUpperCase() + method.slice(1)}
-            </label>
-          ))}
-        </div>
-        {errors.metodoPagamento && (
-          <p className="text-red-500 text-sm mt-1">Selecione um método.</p>
-        )}
-      </div>
+  {cobrarMulta && (
+  <input
+    type="number"
+    placeholder="Multa (%)"
+    value={valorMulta}
+    onChange={(e) => {
+      const valor = e.target.value;
+      setValue("valorMulta", valor === "" ? undefined : Number(valor));
+    }}
+    className="mt-2 block w-full border border-gray-300 rounded px-3 py-2"
+  />
+)}
 
-      <div>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" {...register("cobrarMulta")} />
-          Cobrar Multa
-        </label>
-        {cobrarMulta && (
-          <input
-            type="number"
-            placeholder="Multa (%)"
-            {...register("valorMulta", { required: true })}
-            className="mt-2 block w-full border border-gray-300 rounded px-3 py-2"
-          />
-        )}
-        {errors.valorMulta && cobrarMulta && (
-          <p className="text-red-500 text-sm mt-1">Informe o valor da multa.</p>
-        )}
-      </div>
+  {errors.valorMulta && cobrarMulta && (
+    <p className="text-red-500 text-sm mt-1">{errors.valorMulta.message}</p>
+  )}
+</div>
 
-      <div>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" {...register("cobrarJuros")} />
-          Cobrar Juros
-        </label>
-      </div>
+<div>
+  <label className="flex items-center gap-2">
+    <input
+      type="checkbox"
+      checked={cobrarJuros ?? false}
+      onChange={() => setValue("cobrarJuros", !cobrarJuros)}
+    />
+    Cobrar Juros
+  </label>
 
-            <div className="flex justify-end gap-4 mt-6">
+  {cobrarJuros && (
+  <input
+    type="number"
+    placeholder="Juros (%)"
+    value={valorJuros}
+    onChange={(e) => {
+      const valor = e.target.value;
+      setValue("valorJuros", valor === "" ? undefined : Number(valor));
+    }}
+    className="mt-2 block w-full border border-gray-300 rounded px-3 py-2"
+  />
+)}
+
+  {errors.valorJuros && cobrarJuros && (
+    <p className="text-red-500 text-sm mt-1">{errors.valorJuros.message}</p>
+  )}
+</div>
+      <div className="flex justify-end gap-4 mt-6">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          className="px-4 py-2 border rounded hover:bg-gray-100"
         >
           Cancelar
         </button>
+
         <button
-          type="submit"
-          onClick={handleSubmit(onSubmit)}
+          type="button"
+          onClick={handleConcluir}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Concluir
@@ -116,3 +166,5 @@ export default function Step3Form({ onClose, onSuccess }: Step3FormProps) {
     </div>
   );
 }
+
+

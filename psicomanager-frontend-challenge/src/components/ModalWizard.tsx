@@ -28,17 +28,46 @@ type BankFormData = {
   nomeResponsavel?: string;
   cpfResponsavel?: string;
   mensagem: string;
+  metodoPagamento: string[];
+  cobrarMulta: boolean;
+  valorMulta: number;
+  cobrarJuros: boolean;
+  valorJuros: number;
 };
 
 const onSubmit = (data: BankFormData) => {
   console.log("Dados válidos:", data);
 };
 
+
 const ModalWizard = ({ onClose }: { onClose: () => void }) => {
-  const methods = useForm<BankFormData>({
+const methods = useForm<BankFormData>({
   resolver: zodResolver(bankFormSchema),
   mode: "onChange",
+  defaultValues: {
+    profissional: "Dr. Danilo",
+    metodoPagamento: [],
+    cobrarMulta: false,
+    valorMulta: undefined,
+    cobrarJuros: false,
+    valorJuros: undefined,
+    banco: "",
+    tipoConta: "",
+    agencia: "",
+    contaComDigito: "",
+    tipoPessoa: "Pessoa Física",
+    cpf: "",
+    telefone: "",
+    cep: "",
+    estado: "",
+    cidade: "",
+    endereco: "",
+    numero: "",
+    mensagem: "",
+  },
 });
+
+
   const [step, setStep] = useState(0); // Corrigido: antes estava só setStep
   const [personType, setPersonType] = useState("Pessoa Física");
   const bankOptions = ["Itaú", "Bradesco", "Santander", "Caixa", "Banco do Brasil"];
@@ -200,13 +229,13 @@ onClick={async () => {
     isValid = await trigger([
       "profissional", "banco", "tipoConta", "agencia", "contaComDigito",
       "tipoPessoa", "cpf", "telefone", "cep", "estado", "cidade", "endereco", "numero"
-    ]);
+    ]as const);
   } else {
     isValid = await trigger([
       "profissional", "banco", "tipoConta", "agencia", "contaComDigito",
       "tipoPessoa", "razaoSocial", "cnpj", "nomeResponsavel", "cpfResponsavel",
       "telefone", "cep", "estado", "cidade", "endereco", "numero"
-    ]);
+    ]as const);
   }
 
   if (isValid) {

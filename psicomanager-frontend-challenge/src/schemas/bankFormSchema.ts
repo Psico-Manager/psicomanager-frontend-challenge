@@ -1,8 +1,13 @@
 import { z } from "zod";
 
-export const bankFormSchema = z
-
-  .object({
+export const bankFormSchema = z.object({
+      metodoPagamento: z.array(z.string()).refine((arr) => arr.length > 0, {
+  message: "Selecione pelo menos um método de pagamento",
+}),
+  cobrarMulta: z.boolean(),
+  valorMulta: z.coerce.number().optional(),
+  cobrarJuros: z.boolean(),
+  valorJuros: z.coerce.number().optional(),
     profissional: z.string(),
     banco: z.string().min(1, "Banco é obrigatório"),
     tipoConta: z.string().min(1, "Tipo de conta é obrigatório"),
@@ -29,34 +34,50 @@ tipoPessoa: z.string().refine(
   })
 
   .superRefine((data, ctx) => {
-    if (data.tipoPessoa === "Pessoa Jurídica") {
-      if (!data.razaoSocial) {
-        ctx.addIssue({
-          path: ["razaoSocial"],
-          code: z.ZodIssueCode.custom,
-          message: "Razão Social é obrigatória",
-        });
-      }
-      if (!data.cnpj) {
-        ctx.addIssue({
-          path: ["cnpj"],
-          code: z.ZodIssueCode.custom,
-          message: "CNPJ é obrigatório",
-        });
-      }
-      if (!data.nomeResponsavel) {
-        ctx.addIssue({
-          path: ["nomeResponsavel"],
-          code: z.ZodIssueCode.custom,
-          message: "Nome do responsável é obrigatório",
-        });
-      }
-      if (!data.cpfResponsavel) {
-        ctx.addIssue({
-          path: ["cpfResponsavel"],
-          code: z.ZodIssueCode.custom,
-          message: "CPF do responsável é obrigatório",
-        });
-      }
+  if (data.cobrarMulta && (data.valorMulta === undefined || isNaN(data.valorMulta))) {
+    ctx.addIssue({
+      path: ["valorMulta"],
+      code: "custom",
+      message: "Informe o valor da multa",
+    });
+  }
+
+  if (data.cobrarJuros && (data.valorJuros === undefined || isNaN(data.valorJuros))) {
+    ctx.addIssue({
+      path: ["valorJuros"],
+      code: "custom",
+      message: "Informe o valor dos juros",
+    });
+  }
+
+  if (data.tipoPessoa === "Pessoa Jurídica") {
+    if (!data.razaoSocial?.trim()) {
+      ctx.addIssue({
+        path: ["razaoSocial"],
+        code: "custom",
+        message: "Razão Social é obrigatória",
+      });
     }
-  });
+    if (!data.cnpj?.trim()) {
+      ctx.addIssue({
+        path: ["cnpj"],
+        code: "custom",
+        message: "CNPJ é obrigatório",
+      });
+    }
+    if (!data.nomeResponsavel?.trim()) {
+      ctx.addIssue({
+        path: ["nomeResponsavel"],
+        code: "custom",
+        message: "Nome do responsável é obrigatório",
+      });
+    }
+    if (!data.cpfResponsavel?.trim()) {
+      ctx.addIssue({
+        path: ["cpfResponsavel"],
+        code: "custom",
+        message: "CPF do responsável é obrigatório",
+      });
+    }
+  }
+});
