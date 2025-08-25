@@ -52,29 +52,29 @@ const styles = {
   sidebar: {
     display: "flex",
     flexDirection: "column" as const,
-    gap: "1rem",
-    padding: "1rem",
+    gap: "0.5rem", // reduzido
+    padding: "0.75rem", // reduzido
     backgroundColor: "#f8f8f8",
-    height: "100vh",
-    width: "220px",
+    height: "80%",
+    width: "180px", // era 220px
     borderRight: "1px solid #ddd",
     alignItems: "center",
   },
   icon: {
-    fontSize: "1.5rem",
-    marginBottom: "0.25rem",
+    fontSize: "1.2rem", // era 1.5rem
+    marginBottom: "0.2rem",
   },
   label: {
-    fontSize: "0.75rem",
+    fontSize: "0.65rem", // era 0.75rem
     textAlign: "center" as const,
   },
   active: {
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
-    borderRadius: "8px",
-    padding: "1rem",
-    width: "100%",
+    borderRadius: "6px", // era 8px
+    padding: "0.75rem", // reduzido
+    width: "100%", // mais responsivo
     cursor: "pointer",
     display: "flex",
     flexDirection: "column" as const,
@@ -84,8 +84,8 @@ const styles = {
     backgroundColor: "#e0e0e0",
     color: "#888",
     border: "none",
-    borderRadius: "8px",
-    padding: "1rem",
+    borderRadius: "6px",
+    padding: "0.75rem",
     width: "100%",
     cursor: "not-allowed",
     display: "flex",
@@ -96,8 +96,8 @@ const styles = {
     backgroundColor: "#fff",
     color: "#333",
     border: "1px solid #ccc",
-    borderRadius: "8px",
-    padding: "1rem",
+    borderRadius: "6px",
+    padding: "0.75rem",
     width: "100%",
     cursor: "pointer",
     display: "flex",
@@ -105,5 +105,4 @@ const styles = {
     alignItems: "center",
   },
 };
-
 export default Sidebar;
