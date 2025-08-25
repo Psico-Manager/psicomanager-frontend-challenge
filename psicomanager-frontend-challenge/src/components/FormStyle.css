@@ -1,0 +1,94 @@
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+.form-label span {
+  color: red;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.form-error {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.topo {
+  display: inline-flex;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+p.texto0 {
+  text-align: center;
+}
+
+.texto0 {
+  background-color: rgba(251, 255, 0, 0.4);
+  border: solid rgb(143, 96, 68);
+  border-radius: 5px;
+  color: #55432f;
+  padding: 5px;
+  margin: auto;
+  max-width: 500px;
+  font-size: 12px;
+}
+
+h1, h2, h3, h4 {
+  color: rgb(73, 71, 71);
+}
+
+.texto1 {
+  background-color: rgba(40, 131, 153, 0.4);
+  border: solid rgb(29, 70, 104);
+  border-radius: 5px;
+  color: #293455;
+  padding: 5px;
+  margin: auto;
+  max-width: 500px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.stepBody {
+     display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dynamInp {
+      display: flex;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}
+
+.stepBody { 
+      display: flex;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}
+
+.fundo-psicobank {
+  background-image: url('/images/fundo-psicobank.jpg');
+  background-size: cover;
+  background-position: center;
+}
