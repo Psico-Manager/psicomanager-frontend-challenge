@@ -28,6 +28,7 @@ const {
 } = methods;
 
   const [selectedTag, setSelectedTag] = useState('');
+  const [alert, setAlert] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const quillRef = useRef<ReactQuill | null>(null);
 
   const modules = {
@@ -48,11 +49,6 @@ const {
 
 const formats = ['header', 'bold', 'italic', 'align', 'list', 'link'];
 
-const insertTag = (tag: string) => {
-  const mensagemAtual = getValues("mensagem");
-  setValue("mensagem", `${mensagemAtual} ${tag}`);
-};
-
 const handleNext = async () => {
   const tipoPessoa = getValues("tipoPessoa");
   const mensagem = getValues("mensagem");
@@ -61,7 +57,7 @@ const handleNext = async () => {
 
   const camposBase = [
     "mensagem", "profissional", "banco", "tipoConta", "agencia", "contaComDigito",
-    "tipoPessoa", "telefone", "cep", "estado", "cidade", "endereco", "numero"
+    "tipoPessoa", "telefone", "cep", "estado", "cidade", "endereco", "numero", "marcacaoDinamica"
   ];
 
   const camposPessoaFisica = ["cpf"];
@@ -78,10 +74,16 @@ const handleNext = async () => {
   console.log("Mensagem válida:", isMensagemValida);
   console.log("Erros:", errors);
 
-  if (isValid && isMensagemValida) {
+if (isValid && isMensagemValida) {
   const data = getValues();
   console.log("Dados válidos:", data);
-  onNext();
+  setAlert({ type: 'success', message: 'Dados validados com sucesso!' });
+  setTimeout(() => {
+    setAlert(null);
+    onNext();
+  }, 1500);
+} else {
+  setAlert({ type: 'error', message: 'Por favor, preencha todos os campos obrigatórios corretamente.' });
 }
 
 }
@@ -97,49 +99,107 @@ const handleNext = async () => {
     history?.redo();
   };
 
+const insertTag = (tag: string) => {
+  const mensagemAtual = getValues("mensagem");
+  const tipoPessoa = getValues("tipoPessoa");
+
+  const nomeCompleto = getValues("nomeCompleto");
+  const cpf = getValues("cpf");
+  const telefone = getValues("telefone");
+
+  const nomeResponsavel = getValues("nomeResponsavel");
+  const cpfResponsavel = getValues("cpfResponsavel");
+
+  let valorInserido = "";
+
+  switch (tag) {
+    case "Nome do cliente":
+      valorInserido =
+        tipoPessoa === "Pessoa Jurídica"
+          ? nomeResponsavel?.trim() || "[Nome não informado]"
+          : nomeCompleto?.trim() || "[Nome não informado]";
+      break;
+
+    case "CPF do cliente":
+      valorInserido =
+        tipoPessoa === "Pessoa Jurídica"
+          ? cpfResponsavel?.trim() || "[CPF não informado]"
+          : cpf?.trim() || "[CPF não informado]";
+      break;
+
+    case "Telefone do cliente":
+      valorInserido = telefone?.trim() || "[Telefone não informado]";
+      break;
+
+    default:
+      valorInserido = "";
+  }
+
+  setValue("mensagem", `${mensagemAtual} ${valorInserido}`);
+};
+
+
   return (
     <div className="p-8 bg-white shadow-lg rounded-xl w-full max-w-2xl mx-auto mt-12 border border-gray-200">
+      {alert && (
+  <div
+    className={`mb-4 px-4 py-3 rounded-md text-sm font-medium ${
+      alert.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+    }`}
+  >
+    {alert.message}
+  </div>
+)}
       <h2 className="text-2xl font-bold mb-6 text-gray-900 tracking-tight">
         Canais de Envio e Mensagens de Cobrança
       </h2>
 
       <div className="space-y-6">
         {/* Profissional */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Profissional</label>
-          <input
-            value=" Dr. Danilo" required
-            readOnly
-            disabled
-            className="w-full border border-gray-300 p-3 rounded-md bg-gray-100 text-gray-800 font-medium shadow-sm"
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Profissional <span style={{ color: 'red' }}>*</span>
+        </label>
+      <input
+        value="Dr. Danilo"
+        readOnly
+        disabled
+        required
+        className="w-full border border-gray-300 p-3 rounded-md bg-gray-100 text-gray-800 font-medium shadow-sm"
+        />
+      </div>
+          <h3>Enviar Cobrança por e-mail:</h3>
+    <div className="texto1">Essa é a mensagem que seus cliente irão receber. Clique no campo de texto para editar o conteúdo da mensagem e depois
+      siga para o proximo passo </div><br></br>
 
         {/* Marcação Dinâmica */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Marcação Dinâmica</label>
-          <div className="flex gap-3">
-            <select
-              value={selectedTag}
-              onChange={(e) => setSelectedTag(e.target.value)}
-              className="border border-gray-300 p-3 rounded-md w-full text-gray-700 shadow-sm"
-            >
-              <option value="">Selecione</option>
-              {dynamicTags.map((tag) => (
-                <option key={tag} value={tag}>
-                  {tag}
-                </option>
-              ))}
-            </select>
-            <button
-               type="button"
-               onClick={() => insertTag(selectedTag)}
-               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md"
-            >
-             Inserir
-            </button>
-          </div>
-        </div>
+        <div className="dinamInp" >
+  <label >
+    Marcação Dinâmica <span style={{ color: 'red' }}>*</span>
+  </label>
+  <div className='stepBody'>
+    <select
+      required
+      value={selectedTag}
+      onChange={(e) => setSelectedTag(e.target.value)}
+      className="border border-gray-300 p-3 rounded-md w-full text-gray-700 shadow-sm"
+    >
+      <option value="">Selecione</option>
+      {dynamicTags.map((tag) => (
+        <option key={tag} value={tag}>
+          {tag}
+        </option>
+      ))}
+    </select>
+    <button
+      type="button"
+      onClick={() => insertTag(selectedTag)}
+      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md"
+    >
+      Inserir
+    </button>
+  </div>
+</div>
         <div className="relative">
   {/* Botões flutuantes no canto superior direito */}
   <div className="absolute top-2 right-2 flex gap-2 z-10">
@@ -187,11 +247,21 @@ const handleNext = async () => {
       </div>
 
       {/* Botões de Navegação */}
-      <div className="flex justify-between mt-8">
+      <div className="buttons">
         <button
           type="button"
-          onClick={onCancel}
-          className="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors shadow-sm"
+          onClick={() => {
+         setAlert(null);
+         onCancel();
+          }}
+          className="display: inline-flex
+;
+    justify-content: space-between;
+    align-content: flex-end;
+    flex-wrap: wrap;
+    width: 100%;
+    flex-direction: row-reverse;
+    align-items: baseline;"
         >
           Cancelar
         </button>

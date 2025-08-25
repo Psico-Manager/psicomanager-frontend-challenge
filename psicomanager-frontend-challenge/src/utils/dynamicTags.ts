@@ -1,9 +1,7 @@
 const dynamicTags = [
-  'Nome do Paciente',
-  'Data da Consulta',
-  'Valor da Sessão',
-  'Link de Pagamento',
-  'Nome do Profissional',
+  'Nome do cliente',
+  'CPF do cliente',
+  'Telefone do cliente',
 ];
 
 export default dynamicTags;

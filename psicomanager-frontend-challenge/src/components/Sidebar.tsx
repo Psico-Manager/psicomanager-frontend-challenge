@@ -4,25 +4,47 @@ interface SidebarProps {
   onFinanceiroClick: () => void;
 }
 
-// eslint-disable-next-line no-empty-pattern
-const Sidebar: React.FC<SidebarProps> = ({ }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onFinanceiroClick }) => {
   return (
     <div style={styles.sidebar}>
-      <button disabled style={styles.disabled}>Painel</button>
-
-      <button disabled style={styles.disabled}>Clientes</button>
-      <button disabled style={styles.disabled}>Agenda</button>
-
-       <button style={styles.active}>
-       Financeiro
-       </button>
-
-
-      <button disabled style={styles.disabled}>Relatórios</button>
-      <button disabled style={styles.disabled}>Marketing</button>
-      <button disabled style={styles.disabled}>Configuração</button>
-      <button disabled style={styles.disabled}>Minha Clínica</button>
+      <SidebarButton icon="📋" label="Painel" disabled />
+      <SidebarButton icon="👥" label="Clientes" disabled />
+      <SidebarButton icon="📅" label="Agenda" disabled />
+      <SidebarButton icon="💰" label="Financeiro" active onClick={onFinanceiroClick} />
+      <SidebarButton icon="📈" label="Relatórios" disabled />
+      <SidebarButton icon="📣" label="Marketing" disabled />
+      <SidebarButton icon="⚙️" label="Configuração" disabled />
+      <SidebarButton icon="🏥" label="Minha Clínica" disabled />
     </div>
+  );
+};
+
+interface SidebarButtonProps {
+  icon: string;
+  label: string;
+  active?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+const SidebarButton: React.FC<SidebarButtonProps> = ({
+  icon,
+  label,
+  active = false,
+  disabled = false,
+  onClick,
+}) => {
+  const style = active
+    ? styles.active
+    : disabled
+    ? styles.disabled
+    : styles.default;
+
+  return (
+    <button style={style} onClick={onClick} disabled={disabled}>
+      <div style={styles.icon}>{icon}</div>
+      <div style={styles.label}>{label}</div>
+    </button>
   );
 };
 
@@ -30,35 +52,57 @@ const styles = {
   sidebar: {
     display: "flex",
     flexDirection: "column" as const,
-    gap: "0.75rem",
+    gap: "1rem",
     padding: "1rem",
     backgroundColor: "#f8f8f8",
     height: "100vh",
     width: "220px",
     borderRight: "1px solid #ddd",
+    alignItems: "center",
   },
-  title: {
-    fontSize: "1.2rem",
-    marginBottom: "1rem",
-    fontWeight: "bold",
+  icon: {
+    fontSize: "1.5rem",
+    marginBottom: "0.25rem",
+  },
+  label: {
+    fontSize: "0.75rem",
+    textAlign: "center" as const,
   },
   active: {
-    padding: "0.75rem",
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
-    borderRadius: "4px",
+    borderRadius: "8px",
+    padding: "1rem",
+    width: "100%",
     cursor: "pointer",
-    textAlign: "left" as const,
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
   },
   disabled: {
-    padding: "0.75rem",
     backgroundColor: "#e0e0e0",
     color: "#888",
     border: "none",
-    borderRadius: "4px",
+    borderRadius: "8px",
+    padding: "1rem",
+    width: "100%",
     cursor: "not-allowed",
-    textAlign: "left" as const,
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+  },
+  default: {
+    backgroundColor: "#fff",
+    color: "#333",
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    padding: "1rem",
+    width: "100%",
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
   },
 };
 
