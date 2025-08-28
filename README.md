@@ -1,6 +1,6 @@
 # Psicomanager FrontEnd Challenge
 
-![Psicomanager](/logo_psicomanager.png)
+![Psicomanager](/psicomanager-logo.png)
 
 ## Desafio
 
