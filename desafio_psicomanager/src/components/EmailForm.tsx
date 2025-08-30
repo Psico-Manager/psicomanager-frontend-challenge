@@ -6,7 +6,7 @@ import { useFormData } from '../context/FormDataContext';
 
 // Estilos com Styled Components
 const Container = styled.div`
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Roboto', system-ui, Avenir, Helvetica, Arial, sans-serif;
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;

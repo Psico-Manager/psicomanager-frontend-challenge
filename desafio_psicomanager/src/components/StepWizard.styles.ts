@@ -8,7 +8,7 @@ export const StepContainer = styled.div`
   max-width: 900px;
   margin: 40px auto;
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Roboto', system-ui, Avenir, Helvetica, Arial, sans-serif;
 `;
 
 export const StepIndicatorContainer = styled.div`
